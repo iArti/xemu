@@ -31,6 +31,7 @@ static char const *const validation_layers[] = {
     "VK_LAYER_KHRONOS_validation",
 };
 
+#if HAVE_EXTERNAL_MEMORY
 static char const *const required_device_extensions[] = {
 #ifdef WIN32
     VK_KHR_EXTERNAL_MEMORY_WIN32_EXTENSION_NAME,
@@ -40,6 +41,7 @@ static char const *const required_device_extensions[] = {
     VK_KHR_EXTERNAL_SEMAPHORE_FD_EXTENSION_NAME,
 #endif
 };
+#endif
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
@@ -308,12 +310,12 @@ get_available_device_extensions(VkPhysicalDevice device)
 
 static StringArray *get_required_device_extension_names(void)
 {
-    StringArray *extensions =
-        g_array_sized_new(FALSE, FALSE, sizeof(char *),
-                          ARRAY_SIZE(required_device_extensions));
+    StringArray *extensions = g_array_new(FALSE, FALSE, sizeof(char *));
 
+#if HAVE_EXTERNAL_MEMORY
     g_array_append_vals(extensions, required_device_extensions,
                         ARRAY_SIZE(required_device_extensions));
+#endif
 
     return extensions;
 }
@@ -335,6 +337,7 @@ static void add_optional_device_extension_names(
 
 static bool check_device_support_required_extensions(VkPhysicalDevice device)
 {
+#if HAVE_EXTERNAL_MEMORY
     g_autoptr(VkExtensionPropertiesArray) available_extensions =
         get_available_device_extensions(device);
 
@@ -346,6 +349,9 @@ static bool check_device_support_required_extensions(VkPhysicalDevice device)
             return false;
         }
     }
+#else
+    (void)device;
+#endif
 
     return true;
 }

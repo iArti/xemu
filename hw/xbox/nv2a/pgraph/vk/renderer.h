@@ -41,7 +41,16 @@
 #include "constants.h"
 #include "glsl.h"
 
+/*
+ * Vulkan drivers available on Windows ARM64 commonly cannot export opaque
+ * Win32 handles.  The renderer already has a slower readback path for this
+ * case, so use it instead of rejecting an otherwise compatible device.
+ */
+#if defined(WIN32) && (defined(__aarch64__) || defined(_M_ARM64))
+#define HAVE_EXTERNAL_MEMORY 0
+#else
 #define HAVE_EXTERNAL_MEMORY 1
+#endif
 
 typedef struct QueueFamilyIndices {
     int queue_family;

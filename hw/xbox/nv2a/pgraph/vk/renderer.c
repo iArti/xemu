@@ -172,7 +172,9 @@ static void pgraph_vk_pre_shutdown_wait(NV2AState *d)
 static int pgraph_vk_get_framebuffer_surface(NV2AState *d)
 {
     PGRAPHState *pg = &d->pgraph;
+#if HAVE_EXTERNAL_MEMORY
     PGRAPHVkState *r = pg->vk_renderer_state;
+#endif
 
     qemu_mutex_lock(&d->pfifo.lock);
 
